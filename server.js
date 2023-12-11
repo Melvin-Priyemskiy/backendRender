@@ -60,57 +60,57 @@ app.listen(port, () => {
 
 
 app.post('/api/createaccount', (req, res) => {
-    const { username, password } = req.body;
+  const { username, password } = req.body;
 
-    //make sure there there is no blank fields
-    if (username.trim() === '' || password.trim() === '') {
-        return res.status(400).json({
-            success: false,
-            message: 'Username and password are required.',
-          });      
-        } else {
-        console.log('The string is not blank.');
+  //make sure there there is no blank fields
+  if (username.trim() === '' || password.trim() === '') {
+      return res.status(400).json({
+          success: false,
+          message: 'Username and password are required.',
+        });      
+      } else {
+      console.log('The string is not blank.');
+    }
+
+  //make sure there is no dup username that exists
+  console.log('This is me',username, password);
+
+  connection.query('SELECT * FROM users', function (error, results, fields) {
+      if (error) 
+      {
+          return res.status(409).json({
+              success: false,
+              message: 'db not connecting try again',
+            });  
       }
+      //console.log("length is this: " + results.length);
+      console.log(results[0]);
 
-    //make sure there is no dup username that exists
-    console.log('This is me',username, password);
-
-    connection.query('SELECT * FROM users', function (error, results, fields) {
+      for (let i = 0; i < results.length; i++) {
+          var dbUsername = results[i].username;
+          if(dbUsername.toLowerCase() == username.toLowerCase())
+          {
+              return res.status(409).json({
+                  success: false,
+                  message: 'Username already exists. Choose a different username.',
+                });            
+          }
+      }
+      connection.query('INSERT INTO users VALUES ("", ?, ?)', [username, password], function (error, results, fields) {
         if (error) 
-        {
-            return res.status(409).json({
-                success: false,
-                message: 'db not connecting try again',
-              });  
-        }
-        //console.log("length is this: " + results.length);
-        console.log(results[0]);
-
-        for (let i = 0; i < results.length; i++) {
-            var dbUsername = results[i].username;
-            if(dbUsername == username)
-            {
-                return res.status(409).json({
-                    success: false,
-                    message: 'Username already exists. Choose a different username.',
-                  });            
-            }
-        }
-        res.json({
-            success: true,
-            message: 'Account Created Successfully'
-          });   
-
+        {            return res.status(409).json({
+          success: false,
+          message: 'db not connecting try again',
+          error: error
+        });  }
     });
+      res.json({
+          success: true,
+          message: 'Account Created Successfully'
+        });   
 
-    connection.query('INSERT INTO users VALUES ("", ?, ?)', [username, password], function (error, results, fields) {
-          if (error) 
-          {            return res.status(409).json({
-            success: false,
-            message: 'db not connecting try again',
-            error: error
-          });  }
-      });    
+  });
+  
 
 });
 
