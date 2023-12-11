@@ -30,7 +30,7 @@ app.use(cors());
 
 
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Origin', 'https://renderfront-ovcw.onrender.com/');
     res.setHeader('Access-Control-Allow-Headers', 'Content-type,Authorization');
     next();
 })
